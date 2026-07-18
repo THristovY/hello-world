@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok Music</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, #1e1e1e, #121212);
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 15px;
+      text-align: center;
+      background: rgba(0,0,0,0.5);
+    }
+    .playlist {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .song {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      transition: 0.2s;
+    }
+    .song:hover, .song.playing {
+      background: rgba(255,255,255,0.1);
+    }
+    .song img {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    .player {
+      background: #1e1e1e;
+      padding: 15px 20px;
+      border-top: 1px solid #333;
+    }
+    .now-playing {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .now-playing img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      margin-right: 15px;
+    }
+    .progress {
+      height: 4px;
+      background: #333;
+      border-radius: 999px;
+      margin: 15px 0;
+      position: relative;
+      cursor: pointer;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #1db954;
+      width: 0%;
+      transition: width 0.1s;
+    }
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      font-size: 28px;
+    }
+    button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .play-pause {
+      font-size: 42px;
+      color: #1db954;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎵 Grok Music</h1>
+  </header>
+
+  <div class="playlist" id="playlist"></div>
+
+  <!-- Player -->
+  <div class="player">
+    <div class="now-playing" id="nowPlaying">
+      <img id="cover" src="https://picsum.photos/300" alt="">
+      <div>
+        <div id="songTitle">Select a song</div>
+        <div id="songArtist" style="opacity:0.7; font-size:14px;">Artist</div>
+      </div>
+    </div>
+
+    <div class="progress" id="progressContainer">
+      <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <div class="controls">
+      <button onclick="prevSong()">⏮</button>
+      <button class="play-pause" id="playBtn" onclick="togglePlay()">▶</button>
+      <button onclick="nextSong()">⏭</button>
+    </div>
+  </div>
+
+  <audio id="audio" style="display:none;"></audio>
+
+  <script>
+    const songs = [
+      { title: "Blinding Lights", artist: "The Weeknd", cover: "https://picsum.photos/id/1015/300" },
+      { title: "Levitating", artist: "Dua Lipa", cover: "https://picsum.photos/id/201/300" },
+      { title: "Stay", artist: "The Kid LAROI", cover: "https://picsum.photos/id/237/300" },
+      { title: "Heat Waves", artist: "Glass Animals", cover: "https://picsum.photos/id/180/300" },
+      { title: "Save Your Tears", artist: "The Weeknd", cover: "https://picsum.photos/id/133/300" },
+      { title: "Peaches", artist: "Justin Bieber", cover: "https://picsum.photos/id/201/300" }
+    ];
+
+    let currentSong = 0;
+    let isPlaying = false;
+    const audio = document.getElementById('audio');
+
+    function renderPlaylist() {
+      const playlist = document.getElementById('playlist');
+      playlist.innerHTML = '<h2 style="margin:0 0 15px 10px;">Good Evening</h2>';
+
+      songs.forEach((song, index) => {
+        const div = document.createElement('div');
+        div.className = 'song';
+        div.innerHTML = `
+          <img src="${song.cover}" alt="">
+          <div>
+            <div>${song.title}</div>
+            <div style="font-size:14px; opacity:0.7;">${song.artist}</div>
+          </div>
+        `;
+        div.onclick = () => playSong(index);
+        playlist.appendChild(div);
+      });
+    }
+
+    function playSong(index) {
+      currentSong = index;
+      const song = songs[index];
+      
+      audio.src = `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${(index % 3) + 1}.mp3`; // Free demo songs
+      audio.play();
+      
+      isPlaying = true;
+      document.getElementById('playBtn').innerHTML = '❚❚';
+      
+      document.getElementById('songTitle').textContent = song.title;
+      document.getElementById('songArtist').textContent = song.artist;
+      document.getElementById('cover').src = song.cover;
+
+      // Highlight current song
+      document.querySelectorAll('.song').forEach((el, i) => {
+        el.classList.toggle('playing', i === index);
+      });
+    }
+
+    function togglePlay() {
+      if (isPlaying) {
+        audio.pause();
+        document.getElementById('playBtn').innerHTML = '▶';
+      } else {
+        audio.play();
+        document.getElementById('playBtn').innerHTML = '❚❚';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function nextSong() {
+      currentSong = (currentSong + 1) % songs.length;
+      playSong(currentSong);
+    }
+
+    function prevSong() {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      playSong(currentSong);
+    }
+
+    // Progress bar
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progress');
+
+    audio.ontimeupdate = () => {
+      if (audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = percent + '%';
+      }
+    };
+
+    progressContainer.onclick = (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pos * audio.duration;
+    };
+
+    // Auto next song
+    audio.onended = () => nextSong();
+
+    // Start the app
+    renderPlaylist();
+  </script>
+</body>
+</html>
