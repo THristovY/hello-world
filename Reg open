@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Talks App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 500px;
+      height: 90vh;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .header {
+      background: #0084ff;
+      color: white;
+      padding: 16px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .messages {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    .message.sent {
+      background: #0084ff;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .message.received {
+      background: #e4e6eb;
+      color: #050505;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .input-area {
+      display: flex;
+      padding: 12px;
+      border-top: 1px solid #ddd;
+      gap: 8px;
+    }
+    input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      font-size: 15px;
+    }
+    button {
+      background: #0084ff;
+      color: white;
+      border: none;
+      padding: 0 20px;
+      border-radius: 24px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    button:hover { background: #0066cc; }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="header">Talks</div>
+    <div class="messages" id="messages">
+      <div class="message received">Hi! Type a message to start your talk.</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="input" placeholder="Type a message..." autofocus>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const messagesDiv = document.getElementById('messages');
+    const input = document.getElementById('input');
+
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      // Your message
+      addMessage(text, 'sent');
+
+      // Simple echo/response (replace this with real logic later)
+      setTimeout(() => {
+        addMessage("Got it: " + text, 'received');
+      }, 600);
+
+      input.value = '';
+      input.focus();
+    }
+
+    function addMessage(text, type) {
+      const div = document.createElement('div');
+      div.className = `message ${type}`;
+      div.textContent = text;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
+</body>
+</html>
